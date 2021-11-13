@@ -1,0 +1,36 @@
+{{define "function"}}
+{{- $f := .}}
+
+func {{.TestName}}(t *testing.T) {
+    Convey("{{ .TestName }}", t, func() {
+        mockCtrl := gomock.NewController(t)
+        defer mockCtrl.Finish()
+
+        var (
+        {{ with .Receiver}} {{Receiver .}} {{.Type}} {{- end}}
+        {{ range .TestParameters}}
+            {{Param .}} {{.Type}}
+        {{- end}}
+        )
+
+        Convey("When no error occur", func(){
+            // Success case
+            // Given
+            // TODO Add some expression here. eg: mocks
+            // When
+            // TODO Add some expression here. eg: mocks.EXPECT().
+            {{- if $f.OnlyReturnsOneValue}}
+                  {{ range .TestResults}} {{Want .}} {{end}} := {{template "inline" $f}}
+            {{ else }}
+                  {{ range .TestResults}} {{Want .}}, {{- end}} {{- if .ReturnsError}} err {{- end}} := {{template "inline" $f}}
+            {{end}}
+            // Then
+            {{ range .TestResults}}So({{Want .}}, ShouldNotBeNil) {{ end}}
+            {{ if .ReturnsError}} So(err, ShouldBeNil) {{- end}}
+
+        })
+    })
+}
+
+{{end}}
+

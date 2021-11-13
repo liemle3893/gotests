@@ -1,0 +1,2 @@
+{{define "call"}}{{with .Receiver}}{{if not .IsStruct}}tt.{{end}}{{Receiver .}}.{{end}}{{.Name}}({{range $i, $el := .Parameters}}{{if $i}}, {{end}}{{if not .IsWriter}}{{end}}{{Param .}}{{if .Type.IsVariadic}}...{{end}}{{end}}){{end}}
+

@@ -1,0 +1,59 @@
+{{define "function"}}
+{{- $f := .}}
+
+func {{.TestName}}(t *testing.T) {
+    type _mocks struct {
+    }
+    var (
+        initMocks = func(mockCtrl *gomock.Controller) *_mocks {
+            return &_mocks{
+            }
+        }
+        setup = func(){
+            // TODO
+        }
+        teardown = func(){
+            // TODO
+        }
+    )
+    type tc struct {
+        name       string
+        configurer func(m *_mocks) ({{- with .Receiver}} {{Receiver .}} {{.Type}} {{- end}}, {{- range .TestParameters}} {{Param .}} {{.Type}}, {{- end}})
+        verifier   func(t *testing.T, {{- range .TestResults}} {{Want .}} {{.Type}}, {{- end}} {{- if .ReturnsError}} err error {{- end}})
+    }
+    ts := []tc{
+        // TODO - Add test data here
+        {
+            name: "Should success",
+            configurer: func(m *_mocks) ({{- with .Receiver}} {{Receiver .}} {{.Type}} {{- end}}, {{- range .TestParameters}} {{Param .}} {{.Type}}, {{- end}}) {
+                // TODO
+                return
+            },
+            verifier: func(t *testing.T, {{ range .TestResults}} {{Want .}} {{.Type}}, {{- end}} {{- if .ReturnsError}} err error {{ end}}) {
+                // TODO
+                {{ if .ReturnsError}} assert.Nil(t,err){{ end}}
+            },
+        },
+    }
+    for _, tt := range ts {
+        t.Run(tt.name, func(t *testing.T){
+            mockCtrl := gomock.NewController(t)
+            defer mockCtrl.Finish()
+            setup()
+            defer teardown()
+            // Given
+            var m *_mocks
+            if initMocks != nil {
+                m = initMocks(mockCtrl)
+            }
+            {{ with .Receiver}} {{Receiver .}} {{- end}},{{range $index, $element := .TestParameters}} {{- if $index}},{{end}} {{Param $element}} {{- end}} := tt.configurer(m)
+            // When
+            {{range .TestResults}} {{Want .}}, {{- end}} {{- if .ReturnsError}} err {{- end}} := {{template "inline" $f}}
+            // Then
+            tt.verifier(t, {{- range .TestResults}} {{Want .}}, {{- end}} {{- if .ReturnsError}} err {{- end}})
+        })
+    }
+}
+
+{{end}}
+
