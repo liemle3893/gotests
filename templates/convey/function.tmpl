@@ -25,9 +25,9 @@ func {{.TestName}}(t *testing.T) {
                   {{ range .TestResults}} {{Want .}}, {{- end}} {{- if .ReturnsError}} err {{- end}} := {{template "inline" $f}}
             {{end}}
             // Then
-            {{ range .TestResults}}So({{Want .}}, ShouldNotBeNil) {{ end}}
-            {{ if .ReturnsError}} So(err, ShouldBeNil) {{- end}}
-
+            {{ range .TestResults}}
+            So({{Want .}}, ShouldNotBeNil){{ end}}
+            {{ if .ReturnsError}}So(err, ShouldBeNil) {{- end}}
         })
     })
 }
